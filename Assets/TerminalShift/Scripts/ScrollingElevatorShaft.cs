@@ -12,15 +12,10 @@ public class ScrollingElevatorShaft : MonoBehaviour
 	public float RequiredShaftBottomY = -30.0f;
 
 	public bool DebugEnabled = false;
-	
+
 	public void AdvanceShaft(
 		float movementDistance)
 	{
-		if (DebugEnabled)
-		{
-			Debug.LogFormat("Advancing by {0}.", movementDistance);
-		}
-
 		// Advance all the existing shaft segments.
 		foreach (GameObject shaftSegment in currentShaftSegments)
 		{

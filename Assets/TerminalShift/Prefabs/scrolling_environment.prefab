@@ -43,9 +43,9 @@ MonoBehaviour:
   - {fileID: 139408, guid: a3550882b3adcbb48afbbfb28d44b33a, type: 2}
   - {fileID: 147922, guid: 798ab9fa969cd064da207565ee640644, type: 2}
   ShaftSegmentHeight: 20
-  RequiredShaftTopY: 50
-  RequiredShaftBottomY: -100
-  DebugEnabled: 0
+  RequiredShaftTopY: 75
+  RequiredShaftBottomY: -75
+  DebugEnabled: 1
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1

@@ -11,7 +11,7 @@ public class DropShadowOrienter : MonoBehaviour
 		transform.rotation = 
 			Quaternion.LookRotation(
 				FacingDirection, 
-				(transform.parent.rotation * Vector3.forward));
+				(transform.parent.rotation * Vector3.up));
 	}
 }
 
