@@ -11,6 +11,7 @@ GameObject:
   - 33: {fileID: 3390438}
   - 65: {fileID: 6599826}
   - 23: {fileID: 2321118}
+  - 114: {fileID: 11412428}
   m_Layer: 0
   m_Name: player_platform
   m_TagString: Untagged
@@ -75,6 +76,38 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &11412428
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 196532}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9b3c41fea35df34fa85ece33cadac7f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  CurrentSpeed: 0
+  TerminalSpeed: 30
+  PlatformMorphDurationSeconds: 0.3
+  ShapeBindings:
+  - ShapeType: 0
+    ShapePrefab: {fileID: 0}
+  - ShapeType: 1
+    ShapePrefab: {fileID: 0}
+  - ShapeType: 2
+    ShapePrefab: {fileID: 0}
+  - ShapeType: 3
+    ShapePrefab: {fileID: 0}
+  - ShapeType: 4
+    ShapePrefab: {fileID: 183226, guid: 28eb9d0dea8c5424a8e55a5bbbda6a57, type: 2}
+  - ShapeType: 5
+    ShapePrefab: {fileID: 0}
+  PlatformMorphDesiredShape: 4
+  PlatformMorphStartShape: 4
+  PlatformMorphEndShape: 4
+  PlatformMorphFraction: 1
+  EffectivePlatformShape: 4
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
