@@ -47,10 +47,10 @@ public class PlayerPlatform : MonoBehaviour
 
 		morphingPlatformRoot = new GameObject();
 		morphingPlatformRoot.name = "morphing_platform_root";
-		morphingPlatformRoot.transform.parent = transform;
-		morphingPlatformRoot.transform.localPosition = Vector3.zero;
-		morphingPlatformRoot.transform.localRotation = Quaternion.identity;
-		morphingPlatformRoot.transform.localScale = Vector3.one;
+
+		morphingPlatformRoot.transform.SetParent(
+			transform,
+			worldPositionStays: false);
 
 		UpdatePlatformMorphCreatedPlatformObjects();
 	}
@@ -136,13 +136,19 @@ public class PlayerPlatform : MonoBehaviour
 		if (startShapeBinding.ShapePrefab != null)
 		{
 			currentMorphStartObject = GameObject.Instantiate(startShapeBinding.ShapePrefab);
-			currentMorphStartObject.transform.parent = morphingPlatformRoot.transform;
+
+			currentMorphStartObject.transform.SetParent(
+				morphingPlatformRoot.transform,
+				worldPositionStays: false);
 		}
 			
 		if (endShapeBinding.ShapePrefab != null)
 		{
 			currentMorphEndObject = GameObject.Instantiate(endShapeBinding.ShapePrefab);
-			currentMorphEndObject.transform.parent = morphingPlatformRoot.transform;
+
+			currentMorphEndObject.transform.SetParent(
+				morphingPlatformRoot.transform,
+				worldPositionStays: false);
 		}
 	}
 
