@@ -116,7 +116,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   CurrentFallSpeed: 0
-  TerminalFallSpeed: 50
+  TerminalFallSpeed: 20
   PlatformMorphDurationSeconds: 0.3
   PlatformRotationDurationSeconds: 0.2
   ShapeBindings:
