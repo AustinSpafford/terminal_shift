@@ -1,5 +1,21 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &112756
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 436496}
+  - 114: {fileID: 11412428}
+  m_Layer: 0
+  m_Name: player_platform
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
 --- !u!1 &196532
 GameObject:
   m_ObjectHideFlags: 0
@@ -12,12 +28,25 @@ GameObject:
   - 65: {fileID: 6599826}
   - 23: {fileID: 2321118}
   m_Layer: 0
-  m_Name: player_platform
+  m_Name: platform_core
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!4 &436496
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 112756}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 471556}
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
 --- !u!4 &471556
 Transform:
   m_ObjectHideFlags: 1
@@ -25,10 +54,10 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 196532}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.5, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0, y: -0.25, z: 0}
+  m_LocalScale: {x: 1, y: 0.5, z: 1}
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 436496}
   m_RootOrder: 0
 --- !u!23 &2321118
 MeshRenderer:
@@ -75,6 +104,41 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &11412428
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 112756}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9b3c41fea35df34fa85ece33cadac7f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  CurrentFallSpeed: 0
+  TerminalFallSpeed: 20
+  PlatformMorphDurationSeconds: 0.3
+  PlatformRotationDurationSeconds: 0.2
+  ShapeBindings:
+  - ShapeType: 0
+    ShapePrefab: {fileID: 0}
+  - ShapeType: 1
+    ShapePrefab: {fileID: 0}
+  - ShapeType: 2
+    ShapePrefab: {fileID: 0}
+  - ShapeType: 3
+    ShapePrefab: {fileID: 0}
+  - ShapeType: 4
+    ShapePrefab: {fileID: 183226, guid: 28eb9d0dea8c5424a8e55a5bbbda6a57, type: 2}
+  - ShapeType: 5
+    ShapePrefab: {fileID: 178062, guid: 8d807fc89ab254f428f6d919ea71f18c, type: 2}
+  PlatformMorphDesiredShape: 4
+  PlatformMorphStartShape: 4
+  PlatformMorphEndShape: 4
+  PlatformMorphFraction: 1
+  PlatformRotationDesiredOrientation: {x: 0, y: 0, z: 0, w: 1}
+  PlatformRotationAngularVelocity: 0
+  EffectivePlatformShape: 4
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
@@ -84,5 +148,5 @@ Prefab:
     m_Modifications: []
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
-  m_RootGameObject: {fileID: 196532}
+  m_RootGameObject: {fileID: 112756}
   m_IsPrefabParent: 1

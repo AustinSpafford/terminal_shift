@@ -1,6 +1,6 @@
 fileFormatVersion: 2
-guid: 58e6d3afc013a364095977307b3e5f0a
-timeCreated: 1460785510
+guid: bd225c481b9e77c42b1abb84b62532d0
+timeCreated: 1460844548
 licenseType: Free
 ModelImporter:
   serializedVersion: 19
@@ -9,9 +9,7 @@ ModelImporter:
     400000: //RootNode
     2300000: //RootNode
     3300000: //RootNode
-    4300000: Tube
-    7400000: Default Take
-    9500000: //RootNode
+    4300000: Floor.Final
   materials:
     importMaterials: 1
     materialName: 0
@@ -70,7 +68,7 @@ ModelImporter:
     rootMotionBoneName: 
     hasTranslationDoF: 0
   lastHumanDescriptionAvatarSource: {instanceID: 0}
-  animationType: 2
+  animationType: 0
   humanoidOversampling: 1
   additionalBone: 0
   userData: 

@@ -41,10 +41,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShaftSegmentPrefabs:
   - {fileID: 139408, guid: a3550882b3adcbb48afbbfb28d44b33a, type: 2}
-  - {fileID: 147922, guid: 798ab9fa969cd064da207565ee640644, type: 2}
+  - {fileID: 100622, guid: 17d1cae576986b940b7cfc1b55dad00e, type: 2}
   ShaftSegmentHeight: 20
-  RequiredShaftTopY: 75
-  RequiredShaftBottomY: -75
+  RequiredShaftTopY: 100
+  RequiredShaftBottomY: -100
   DebugEnabled: 1
 --- !u!1001 &100100000
 Prefab:

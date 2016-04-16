@@ -1,0 +1,125 @@
+fileFormatVersion: 2
+guid: 3c2a2a0353a733a428a60a9c02e31165
+timeCreated: 1460848927
+licenseType: Free
+ModelImporter:
+  serializedVersion: 19
+  fileIDToRecycleName:
+    100000: //RootNode
+    100002: Floor.CSG
+    100004: Floor.Final
+    100006: LetterY
+    100008: PlatformY.Bottom
+    100010: PlatformY.Bottom.001
+    100012: PlatformY.Left
+    100014: PlatformY.Left.001
+    100016: PlatformY.Right
+    100018: PlatformY.Right.001
+    100020: PlayerPlatform
+    400000: //RootNode
+    400002: Floor.CSG
+    400004: Floor.Final
+    400006: LetterY
+    400008: PlatformY.Bottom
+    400010: PlatformY.Bottom.001
+    400012: PlatformY.Left
+    400014: PlatformY.Left.001
+    400016: PlatformY.Right
+    400018: PlatformY.Right.001
+    400020: PlayerPlatform
+    2300000: //RootNode
+    2300002: Floor.CSG
+    2300004: Floor.Final
+    2300006: LetterY
+    2300008: PlatformY.Bottom
+    2300010: PlatformY.Bottom.001
+    2300012: PlatformY.Left
+    2300014: PlatformY.Left.001
+    2300016: PlatformY.Right
+    2300018: PlatformY.Right.001
+    2300020: PlayerPlatform
+    3300000: //RootNode
+    3300002: Floor.CSG
+    3300004: Floor.Final
+    3300006: LetterY
+    3300008: PlatformY.Bottom
+    3300010: PlatformY.Bottom.001
+    3300012: PlatformY.Left
+    3300014: PlatformY.Left.001
+    3300016: PlatformY.Right
+    3300018: PlatformY.Right.001
+    3300020: PlayerPlatform
+    4300000: Floor.Final
+    4300002: PlatformY.Bottom
+    4300004: PlatformY.Left
+    4300006: PlatformY.Right
+    4300008: Floor.CSG
+    4300010: PlayerPlatform
+    4300012: LetterY
+    4300014: PlatformY.Bottom.001
+    4300016: PlatformY.Left.001
+    4300018: PlatformY.Right.001
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleRotations: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 0
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
