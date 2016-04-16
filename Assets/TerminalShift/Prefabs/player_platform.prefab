@@ -41,7 +41,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 112756}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.5, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 471556}
@@ -54,7 +54,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 196532}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.25, z: 0}
+  m_LocalPosition: {x: 0, y: -0.25, z: 0}
   m_LocalScale: {x: 1, y: 0.5, z: 1}
   m_Children: []
   m_Father: {fileID: 436496}
@@ -115,9 +115,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9b3c41fea35df34fa85ece33cadac7f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CurrentSpeed: 0
-  TerminalSpeed: 30
+  CurrentFallSpeed: 0
+  TerminalFallSpeed: 50
   PlatformMorphDurationSeconds: 0.3
+  PlatformRotationDurationSeconds: 0.2
   ShapeBindings:
   - ShapeType: 0
     ShapePrefab: {fileID: 0}
@@ -135,6 +136,8 @@ MonoBehaviour:
   PlatformMorphStartShape: 4
   PlatformMorphEndShape: 4
   PlatformMorphFraction: 1
+  PlatformRotationDesiredOrientation: {x: 0, y: 0, z: 0, w: 1}
+  PlatformRotationAngularVelocity: 0
   EffectivePlatformShape: 4
 --- !u!1001 &100100000
 Prefab:

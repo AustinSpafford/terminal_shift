@@ -22,10 +22,12 @@ public class PlayerPlatform : MonoBehaviour
 		public GameObject ShapePrefab;
 	}
 
-	public float CurrentSpeed = 0.0f;
-	public float TerminalSpeed = 50.0f;
+	public float CurrentFallSpeed = 0.0f;
+	public float TerminalFallSpeed = 50.0f;
 	
 	public float PlatformMorphDurationSeconds = 1.0f;
+
+	public float PlatformRotationDurationSeconds = 1.0f;
 
 	public PlatformShapeBinding[] ShapeBindings = null;
 	
@@ -33,26 +35,41 @@ public class PlayerPlatform : MonoBehaviour
 	public PlatformShape PlatformMorphStartShape = PlatformShape.LetterX;
 	public PlatformShape PlatformMorphEndShape = PlatformShape.LetterX;
 	public float PlatformMorphFraction = 1.0f;
+	
+	public Quaternion PlatformRotationDesiredOrientation = Quaternion.identity;
+	public float PlatformRotationAngularVelocity = 0.0f;
 
 	public PlatformShape EffectivePlatformShape = PlatformShape.LetterX;
 
 	public void Awake()
 	{
 		scrollingElevatorShaft = FindObjectOfType<ScrollingElevatorShaft>();
+
+		morphingPlatformRoot = new GameObject();
+		morphingPlatformRoot.name = "morphing_platform_root";
+		morphingPlatformRoot.transform.parent = transform;
+		morphingPlatformRoot.transform.localPosition = Vector3.zero;
+		morphingPlatformRoot.transform.localRotation = Quaternion.identity;
+		morphingPlatformRoot.transform.localScale = Vector3.one;
+
+		UpdatePlatformMorphCreatedPlatformObjects();
 	}
 
 	public void Update()
 	{
 		UpdatePlatformMorph();
 
-		CurrentSpeed = 
-			Mathf.Min(
-				(CurrentSpeed + (Physics.gravity.magnitude * Time.deltaTime)),
-				TerminalSpeed);
+		UpdatePlatformRotation();
 
-		scrollingElevatorShaft.AdvanceShaft(CurrentSpeed * Time.deltaTime);
+		CurrentFallSpeed = 
+			Mathf.Min(
+				(CurrentFallSpeed + (Physics.gravity.magnitude * Time.deltaTime)),
+				TerminalFallSpeed);
+
+		scrollingElevatorShaft.AdvanceShaft(CurrentFallSpeed * Time.deltaTime);
 	}
 
+	private GameObject morphingPlatformRoot = null;
 	private GameObject currentMorphStartObject = null;
 	private GameObject currentMorphEndObject = null;
 
@@ -60,41 +77,22 @@ public class PlayerPlatform : MonoBehaviour
 
 	private bool letterLAxisWasPressed = false;
 	private bool letterRAxisWasPressed = false;
-	
+
+	private PlatformShapeBinding GetShapeBinding(
+		PlatformShape platformShape)
+	{
+		return ShapeBindings
+			.Where(element => (element.ShapeType == platformShape))
+			.FirstOrDefault();
+	}
+
 	private void UpdatePlatformMorph()
 	{
 		UpdatePlatformMorphDesiredShape();
 
 		if (PlatformMorphDesiredShape != PlatformMorphEndShape)
 		{
-			if (currentMorphStartObject != null)
-			{
-				GameObject.Destroy(currentMorphStartObject);
-			}
-			
-			if (currentMorphEndObject != null)
-			{
-				GameObject.Destroy(currentMorphEndObject);
-			}
-
-			PlatformMorphStartShape = PlatformMorphEndShape;
-			PlatformMorphEndShape = PlatformMorphDesiredShape;
-			PlatformMorphFraction = 0.0f;
-			
-			PlatformShapeBinding startShapeBinding = GetShapeBinding(PlatformMorphStartShape);
-			PlatformShapeBinding endShapeBinding = GetShapeBinding(PlatformMorphEndShape);
-
-			if (startShapeBinding.ShapePrefab != null)
-			{
-				currentMorphStartObject = GameObject.Instantiate(startShapeBinding.ShapePrefab);
-				currentMorphStartObject.transform.parent = transform;
-			}
-			
-			if (endShapeBinding.ShapePrefab != null)
-			{
-				currentMorphEndObject = GameObject.Instantiate(endShapeBinding.ShapePrefab);
-				currentMorphEndObject.transform.parent = transform;
-			}
+			UpdatePlatformMorphCreatedPlatformObjects();
 		}
 
 		PlatformMorphFraction = 
@@ -114,6 +112,38 @@ public class PlayerPlatform : MonoBehaviour
 		}
 		
 		UpdateDisplayedPlatformMorph();
+	}
+
+	private void UpdatePlatformMorphCreatedPlatformObjects()
+	{
+		if (currentMorphStartObject != null)
+		{
+			GameObject.Destroy(currentMorphStartObject);
+		}
+			
+		if (currentMorphEndObject != null)
+		{
+			GameObject.Destroy(currentMorphEndObject);
+		}
+
+		PlatformMorphStartShape = PlatformMorphEndShape;
+		PlatformMorphEndShape = PlatformMorphDesiredShape;
+		PlatformMorphFraction = 0.0f;
+			
+		PlatformShapeBinding startShapeBinding = GetShapeBinding(PlatformMorphStartShape);
+		PlatformShapeBinding endShapeBinding = GetShapeBinding(PlatformMorphEndShape);
+
+		if (startShapeBinding.ShapePrefab != null)
+		{
+			currentMorphStartObject = GameObject.Instantiate(startShapeBinding.ShapePrefab);
+			currentMorphStartObject.transform.parent = morphingPlatformRoot.transform;
+		}
+			
+		if (endShapeBinding.ShapePrefab != null)
+		{
+			currentMorphEndObject = GameObject.Instantiate(endShapeBinding.ShapePrefab);
+			currentMorphEndObject.transform.parent = morphingPlatformRoot.transform;
+		}
 	}
 
 	private void UpdateDisplayedPlatformMorph()
@@ -164,13 +194,50 @@ public class PlayerPlatform : MonoBehaviour
 		letterLAxisWasPressed = letterLIsPressed;
 		letterRAxisWasPressed = letterRIsPressed;
 	}
-
-	private PlatformShapeBinding GetShapeBinding(
-		PlatformShape platformShape)
+	
+	private void UpdatePlatformRotation()
 	{
-		return ShapeBindings
-			.Where(element => (element.ShapeType == platformShape))
-			.FirstOrDefault();
+		UpdatePlatformRotationDesiredOrientation();
+		
+		UpdatePlatformRotationCurrentOrientation();
+	}
+
+	private void UpdatePlatformRotationCurrentOrientation()
+	{
+		float currentDegreesFromTarget =
+			Quaternion.Angle(
+				morphingPlatformRoot.transform.rotation,
+				PlatformRotationDesiredOrientation);
+		
+		if (currentDegreesFromTarget > Mathf.Epsilon)
+		{
+			float newDegreesFromTarget =
+				Mathf.SmoothDampAngle(
+					currentDegreesFromTarget,
+					0.0f, // targetAngle
+					ref PlatformRotationAngularVelocity,
+					PlatformRotationDurationSeconds);
+		
+			morphingPlatformRoot.transform.rotation =
+				Quaternion.Slerp(
+					PlatformRotationDesiredOrientation,
+					morphingPlatformRoot.transform.rotation,
+					(newDegreesFromTarget / currentDegreesFromTarget));
+		}
+	}
+
+	private void UpdatePlatformRotationDesiredOrientation()
+	{
+		if (Input.GetButtonDown("PlatformRotateClockwise"))
+		{
+			PlatformRotationDesiredOrientation =
+				(Quaternion.Euler(0, 90, 0) * PlatformRotationDesiredOrientation);
+		}
+		else if (Input.GetButtonDown("PlatformRotateCounterclockwise"))
+		{
+			PlatformRotationDesiredOrientation =
+				(Quaternion.Euler(0, -90, 0) * PlatformRotationDesiredOrientation);
+		}
 	}
 }
 
