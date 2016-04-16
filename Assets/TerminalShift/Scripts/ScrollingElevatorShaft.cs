@@ -62,7 +62,14 @@ public class ScrollingElevatorShaft : MonoBehaviour
 			{
 				lowestLocalPositionY -= ShaftSegmentHeight;
 
-				GameObject randomSegmentPrefab = ShaftSegmentPrefabs[segmentRandomizer.Next(ShaftSegmentPrefabs.Length)];
+				GameObject randomSegmentPrefab = 
+					ShaftSegmentPrefabs[segmentRandomizer.Next(ShaftSegmentPrefabs.Length)];
+
+				Quaternion randomSegmentRotation =
+					Quaternion.Euler(
+						0.0f,
+						(90.0f * segmentRandomizer.Next(3)),
+						0.0f);
 				
 				GameObject newShaftSegment =
 					Instantiate(
@@ -70,7 +77,12 @@ public class ScrollingElevatorShaft : MonoBehaviour
 						new Vector3(0.0f, lowestLocalPositionY, 0.0f),
 						Quaternion.identity) as GameObject;
 
-				newShaftSegment.transform.parent = transform;
+				newShaftSegment.transform.SetParent(
+					transform,
+					worldPositionStays: false);
+				
+				newShaftSegment.transform.rotation =
+					(randomSegmentRotation * newShaftSegment.transform.rotation);
 
 				currentShaftSegments.Add(newShaftSegment);
 			}
