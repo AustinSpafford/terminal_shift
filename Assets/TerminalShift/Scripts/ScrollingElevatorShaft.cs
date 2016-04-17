@@ -4,41 +4,68 @@ using System.Text;
 
 public class ScrollingElevatorShaft : MonoBehaviour
 {
-	public GameObject[] ShaftSegmentPrefabs = null;
+	[System.Serializable]
+	public class ShaftSegmentPrefab
+	{
+		public GameObject Prefab;
+		public float SelectionWeight = 1.0f;
+		public Bounds AnalyzedSegmentLocalBounds;
+		public bool AnalyzedSegmentContainsObstacle;
+	}
 
-	public float ShaftSegmentHeight = 10.0f;
+	[System.Serializable]
+	public class ShaftSegmentInstance
+	{
+		public GameObject Instance;
+		public ShaftSegmentPrefab SourcePrefab;
+	}
+
+	public ShaftSegmentPrefab[] SegmentPrefabs = null;
+
+	public List<ShaftSegmentInstance> SegmentInstances = new List<ShaftSegmentInstance>();
 
 	public float RequiredShaftTopY = 30.0f;
 	public float RequiredShaftBottomY = -30.0f;
 
+	public float MinimumDistanceBetweenObstacleSegments = 30.0f;
+
 	public bool DebugEnabled = false;
+	
+	public void Awake()
+	{
+		UpdateShaftSegmentPrefabs();
+	}
 
 	public void AdvanceShaft(
 		float movementDistance)
 	{
 		// Advance all the existing shaft segments.
-		foreach (GameObject shaftSegment in currentShaftSegments)
+		foreach (ShaftSegmentInstance segmentInstance in SegmentInstances)
 		{
-			Vector3 localShaftPosition = shaftSegment.transform.localPosition;
+			Vector3 localShaftPosition = segmentInstance.Instance.transform.localPosition;
 
 			localShaftPosition.y += movementDistance;
 
-			shaftSegment.transform.localPosition = localShaftPosition;
+			segmentInstance.Instance.transform.localPosition = localShaftPosition;
 		}
 
 		// Retire any shaft segments that have moved out of range.
 		for (
 			int index = 0;
-			index < currentShaftSegments.Count;
+			index < SegmentInstances.Count;
 			/* internal increment */)
 		{
-			float segmentBottom = (currentShaftSegments[index].transform.localPosition.y - (ShaftSegmentHeight / 2.0f));
+			ShaftSegmentInstance segmentInstance = SegmentInstances[index];
+
+			float segmentBottom = (
+				segmentInstance.Instance.transform.localPosition.y +
+				segmentInstance.SourcePrefab.AnalyzedSegmentLocalBounds.min.y);
 
 			if (segmentBottom > RequiredShaftTopY)
 			{
-				GameObject.Destroy(currentShaftSegments[index]);
+				GameObject.Destroy(segmentInstance.Instance);
 
-				currentShaftSegments.RemoveAt(index);
+				SegmentInstances.RemoveAt(index);
 			}
 			else
 			{
@@ -48,49 +75,150 @@ public class ScrollingElevatorShaft : MonoBehaviour
 
 		// Create new shaft segments.
 		{
-			float lowestLocalPositionY = (RequiredShaftTopY + (ShaftSegmentHeight / 2.0f));
+			Bounds shaftBounds = new Bounds();
 			
-			foreach (GameObject shaftSegment in currentShaftSegments)
+			foreach (ShaftSegmentInstance segmentInstance in SegmentInstances)
 			{
-				if (shaftSegment.transform.localPosition.y < lowestLocalPositionY)
-				{
-					lowestLocalPositionY = shaftSegment.transform.localPosition.y;
-				}
+				Bounds segmentBounds = segmentInstance.SourcePrefab.AnalyzedSegmentLocalBounds;
+				segmentBounds.center += segmentInstance.Instance.transform.localPosition;
+
+				shaftBounds.Encapsulate(segmentBounds);
 			}
 
-			while (lowestLocalPositionY > (RequiredShaftBottomY - (ShaftSegmentHeight / 2.0f)))
+			while (shaftBounds.min.y > RequiredShaftBottomY)
 			{
-				lowestLocalPositionY -= ShaftSegmentHeight;
-
-				GameObject randomSegmentPrefab = 
-					ShaftSegmentPrefabs[segmentRandomizer.Next(ShaftSegmentPrefabs.Length)];
+				ShaftSegmentPrefab randomSegmentPrefab = SelectRandomSegmentPrefab();
 
 				Quaternion randomSegmentRotation =
 					Quaternion.Euler(
 						0.0f,
-						(90.0f * segmentRandomizer.Next(3)),
+						(90.0f * segmentRandomizer.Next(4)),
 						0.0f);
+
+				float newSegmentPositionY = (
+					shaftBounds.min.y -
+					randomSegmentPrefab.AnalyzedSegmentLocalBounds.max.y);
 				
 				GameObject newShaftSegment =
-					Instantiate(
-						randomSegmentPrefab,
-						new Vector3(0.0f, lowestLocalPositionY, 0.0f),
-						Quaternion.identity) as GameObject;
+					Instantiate(randomSegmentPrefab.Prefab) as GameObject;
 
 				newShaftSegment.transform.SetParent(
 					transform,
 					worldPositionStays: false);
 				
-				newShaftSegment.transform.rotation =
-					(randomSegmentRotation * newShaftSegment.transform.rotation);
+				newShaftSegment.transform.localPosition =
+						new Vector3(0.0f, newSegmentPositionY, 0.0f);
+				
+				newShaftSegment.transform.localRotation =
+					(randomSegmentRotation * newShaftSegment.transform.localRotation);
 
-				currentShaftSegments.Add(newShaftSegment);
+				ShaftSegmentInstance segmentInstance = new ShaftSegmentInstance()
+				{
+					Instance = newShaftSegment,
+					SourcePrefab = randomSegmentPrefab,
+				};
+				
+				Bounds segmentBounds = segmentInstance.SourcePrefab.AnalyzedSegmentLocalBounds;
+				segmentBounds.center += segmentInstance.Instance.transform.localPosition;
+
+				SegmentInstances.Add(segmentInstance);
+
+				shaftBounds.Encapsulate(segmentBounds);
+
+				if (randomSegmentPrefab.AnalyzedSegmentContainsObstacle)
+				{
+					distanceSinceLastObstacleSegment = 0.0f;
+				}
+				else
+				{
+					distanceSinceLastObstacleSegment += 
+						randomSegmentPrefab.AnalyzedSegmentLocalBounds.size.y;
+				}
 			}
 		}
 	}
 
-	private List<GameObject> currentShaftSegments = new List<GameObject>();
-
 	private System.Random segmentRandomizer = new System.Random();
+
+	private float distanceSinceLastObstacleSegment = 10000.0f;
+
+	private void UpdateShaftSegmentPrefabs()
+	{
+		foreach (ShaftSegmentPrefab segmentPrefab in SegmentPrefabs)
+		{
+			segmentPrefab.AnalyzedSegmentLocalBounds = new Bounds();
+
+			foreach (MeshFilter meshFilter in segmentPrefab.Prefab.GetComponentsInChildren<MeshFilter>())
+			{
+				Bounds segmentSpaceMeshBounds = new Bounds();
+
+				segmentSpaceMeshBounds.Encapsulate(
+					meshFilter.transform.TransformPoint(meshFilter.sharedMesh.bounds.min));
+				
+				segmentSpaceMeshBounds.Encapsulate(
+					meshFilter.transform.TransformPoint(meshFilter.sharedMesh.bounds.max));
+
+				segmentPrefab.AnalyzedSegmentLocalBounds.Encapsulate(segmentSpaceMeshBounds);
+			}
+			
+			if (segmentPrefab.AnalyzedSegmentLocalBounds.size.y < Mathf.Epsilon)
+			{
+				throw new System.InvalidOperationException("We must have a mesh for every segment!");
+			}
+
+			segmentPrefab.AnalyzedSegmentContainsObstacle =
+				(segmentPrefab.Prefab.GetComponentInChildren<FloorObstacle>() != null);
+		}
+	}
+
+	private bool CanSelectSegmentPrefab(
+		ShaftSegmentPrefab segmentPrefab)
+	{
+		bool segmentIsUnselectableObstacle = (
+			segmentPrefab.AnalyzedSegmentContainsObstacle &&
+			(distanceSinceLastObstacleSegment <= MinimumDistanceBetweenObstacleSegments));
+
+		return !segmentIsUnselectableObstacle;
+	}
+
+	private ShaftSegmentPrefab SelectRandomSegmentPrefab()
+	{
+		float totalSelectableWeight = 0.0f;
+
+		bool canSelectObstacle = 
+			(distanceSinceLastObstacleSegment > MinimumDistanceBetweenObstacleSegments);
+
+		foreach (ShaftSegmentPrefab segmentPrefab in SegmentPrefabs)
+		{
+			if (CanSelectSegmentPrefab(segmentPrefab))
+			{
+				totalSelectableWeight += segmentPrefab.SelectionWeight;
+			}
+		}
+
+		ShaftSegmentPrefab randomSegmentPrefab = null;
+
+		if (totalSelectableWeight > 0.0f)
+		{
+			float remainingTotalWeightUntilSelection = 
+				((float)segmentRandomizer.NextDouble() * totalSelectableWeight);
+			
+			foreach (ShaftSegmentPrefab segmentPrefab in SegmentPrefabs)
+			{
+				if (CanSelectSegmentPrefab(segmentPrefab))
+				{
+					remainingTotalWeightUntilSelection -= segmentPrefab.SelectionWeight;
+
+					if (remainingTotalWeightUntilSelection < Mathf.Epsilon)
+					{
+						randomSegmentPrefab = segmentPrefab;
+						break;
+					}
+				}
+			}
+		}
+
+		return randomSegmentPrefab;
+	}
 }
 
