@@ -68,7 +68,7 @@ public class ScrollingElevatorShaft : MonoBehaviour
 				Quaternion randomSegmentRotation =
 					Quaternion.Euler(
 						0.0f,
-						(90.0f * segmentRandomizer.Next(3)),
+						(90.0f * segmentRandomizer.Next(4)),
 						0.0f);
 				
 				GameObject newShaftSegment =
