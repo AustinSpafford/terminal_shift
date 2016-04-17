@@ -41,27 +41,45 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SegmentPrefabs:
   - Prefab: {fileID: 139408, guid: a3550882b3adcbb48afbbfb28d44b33a, type: 2}
+    SelectionWeight: 1
     AnalyzedSegmentLocalBounds:
       m_Center: {x: 0, y: 0, z: 0}
       m_Extent: {x: 0, y: 0, z: 0}
     AnalyzedSegmentContainsObstacle: 0
   - Prefab: {fileID: 178060, guid: 074db443470a5f447bceaaa64a483cf0, type: 2}
+    SelectionWeight: 1
     AnalyzedSegmentLocalBounds:
       m_Center: {x: 0, y: 0, z: 0}
       m_Extent: {x: 0, y: 0, z: 0}
     AnalyzedSegmentContainsObstacle: 0
   - Prefab: {fileID: 100622, guid: 17d1cae576986b940b7cfc1b55dad00e, type: 2}
+    SelectionWeight: 1
+    AnalyzedSegmentLocalBounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0, y: 0, z: 0}
+    AnalyzedSegmentContainsObstacle: 0
+  - Prefab: {fileID: 116704, guid: 73ceeb9f7f335db41b6ab52798141e03, type: 2}
+    SelectionWeight: 1
     AnalyzedSegmentLocalBounds:
       m_Center: {x: 0, y: 0, z: 0}
       m_Extent: {x: 0, y: 0, z: 0}
     AnalyzedSegmentContainsObstacle: 0
   - Prefab: {fileID: 172286, guid: ffb55049a57671b4aa293f33379a5694, type: 2}
+    SelectionWeight: 1
     AnalyzedSegmentLocalBounds:
       m_Center: {x: 0, y: 0, z: 0}
       m_Extent: {x: 0, y: 0, z: 0}
     AnalyzedSegmentContainsObstacle: 0
+  - Prefab: {fileID: 186936, guid: f28cad2446c8fc74bbdb894f6910b812, type: 2}
+    SelectionWeight: 1
+    AnalyzedSegmentLocalBounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0, y: 0, z: 0}
+    AnalyzedSegmentContainsObstacle: 0
+  SegmentInstances: []
   RequiredShaftTopY: 100
   RequiredShaftBottomY: -100
+  MinimumDistanceBetweenObstacleSegments: 100
   DebugEnabled: 0
 --- !u!1001 &100100000
 Prefab:
