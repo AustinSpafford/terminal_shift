@@ -27,6 +27,12 @@ public class PlayerPlatform : MonoBehaviour
 	public float TerminalFallSpeed = 50.0f;
 	public float LethalFallSpeed = 10.0f;
 
+	public LoopingAudioBlender WindAudioBlender = null;
+	public float WindMinFallSpeed = 1.0f;
+	public float WindMinVolume = 0.2f;
+	public float WindMaxFallSpeed = 20.0f;
+	public float WindMaxVolume = 1.0f;
+
 	public GameObject DeathCrunchAudioPrefab = null;
 	
 	public float PlatformMorphDurationSeconds = 1.0f;
@@ -89,6 +95,8 @@ public class PlayerPlatform : MonoBehaviour
 				TerminalFallSpeed);
 
 		scrollingElevatorShaft.AdvanceShaft(CurrentFallSpeed * Time.deltaTime);
+
+		UpdateWindVolume();
 	}
 
 	private GameObject morphingPlatformRoot = null;
@@ -443,6 +451,24 @@ public class PlayerPlatform : MonoBehaviour
 		{
 			PlatformRotationDesiredOrientation =
 				(Quaternion.Euler(0, -90, 0) * PlatformRotationDesiredOrientation);
+		}
+	}
+
+	private void UpdateWindVolume()
+	{
+		if (WindAudioBlender != null)
+		{
+			float windFallSpeedFraction =
+				Mathf.Clamp01(Mathf.InverseLerp(
+					WindMinFallSpeed,
+					WindMaxFallSpeed,
+					CurrentFallSpeed));
+
+			WindAudioBlender.VolumeFraction =
+				Mathf.Lerp(
+					WindMinVolume,
+					WindMaxVolume,
+					windFallSpeedFraction);
 		}
 	}
 }
