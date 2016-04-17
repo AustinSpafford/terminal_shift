@@ -115,10 +115,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9b3c41fea35df34fa85ece33cadac7f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  CurrentAcceleration: 0
   CurrentFallSpeed: 0
-  TerminalFallSpeed: 20
+  TerminalFallSpeed: 30
+  LethalFallSpeed: 10
   PlatformMorphDurationSeconds: 0.3
   PlatformRotationDurationSeconds: 0.2
+  DistanceToPlatformBottom: 1.2
   ShapeBindings:
   - ShapeType: 0
     ShapePrefab: {fileID: 0}
@@ -139,6 +142,7 @@ MonoBehaviour:
   PlatformRotationDesiredOrientation: {x: 0, y: 0, z: 0, w: 1}
   PlatformRotationAngularVelocity: 0
   EffectivePlatformShape: 4
+  DebugEnabled: 0
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1

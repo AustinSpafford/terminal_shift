@@ -22,15 +22,20 @@ public class PlayerPlatform : MonoBehaviour
 		public GameObject ShapePrefab;
 	}
 
+	public float CurrentAcceleration = 0.0f;
 	public float CurrentFallSpeed = 0.0f;
 	public float TerminalFallSpeed = 50.0f;
+	public float LethalFallSpeed = 10.0f;
 	
 	public float PlatformMorphDurationSeconds = 1.0f;
 
 	public float PlatformRotationDurationSeconds = 1.0f;
 
+	public float DistanceToPlatformBottom = 1.0f; // TODO: Refactor into a separate object/component.
+
 	public PlatformShapeBinding[] ShapeBindings = null;
 	
+	// TODO: Refactor the morphing platform into a separate object/component.
 	public PlatformShape PlatformMorphDesiredShape = PlatformShape.LetterX;
 	public PlatformShape PlatformMorphStartShape = PlatformShape.LetterX;
 	public PlatformShape PlatformMorphEndShape = PlatformShape.LetterX;
@@ -40,6 +45,8 @@ public class PlayerPlatform : MonoBehaviour
 	public float PlatformRotationAngularVelocity = 0.0f;
 
 	public PlatformShape EffectivePlatformShape = PlatformShape.LetterX;
+
+	public bool DebugEnabled = false;
 
 	public void Awake()
 	{
@@ -53,6 +60,8 @@ public class PlayerPlatform : MonoBehaviour
 			worldPositionStays: false);
 
 		UpdatePlatformMorphCreatedPlatformObjects();
+		
+		CurrentAcceleration = Physics.gravity.magnitude;
 	}
 
 	public void Update()
@@ -61,9 +70,11 @@ public class PlayerPlatform : MonoBehaviour
 
 		UpdatePlatformRotation();
 
+		InteractWithNearestObstacle();
+
 		CurrentFallSpeed = 
 			Mathf.Min(
-				(CurrentFallSpeed + (Physics.gravity.magnitude * Time.deltaTime)),
+				(CurrentFallSpeed + (CurrentAcceleration * Time.deltaTime)),
 				TerminalFallSpeed);
 
 		scrollingElevatorShaft.AdvanceShaft(CurrentFallSpeed * Time.deltaTime);
@@ -75,8 +86,35 @@ public class PlayerPlatform : MonoBehaviour
 
 	private ScrollingElevatorShaft scrollingElevatorShaft = null;
 
+	private FloorObstacle nextObstacle = null;
+
 	private bool letterLAxisWasPressed = false;
 	private bool letterRAxisWasPressed = false;
+
+	private FloorObstacle FindNextObstacle()
+	{
+		FloorObstacle nearestObstacle = null;
+
+		foreach (ScrollingElevatorShaft.ShaftSegmentInstance segmentInstance in scrollingElevatorShaft.SegmentInstances)
+		{
+			if (segmentInstance.SourcePrefab.AnalyzedSegmentContainsObstacle)
+			{
+				foreach (FloorObstacle candidateObstacle in segmentInstance.Instance.GetComponentsInChildren<FloorObstacle>())
+				{
+					if (candidateObstacle.transform.position.y < (transform.position.y - DistanceToPlatformBottom))
+					{
+						if ((nearestObstacle == null) ||
+							(candidateObstacle.transform.position.y > nearestObstacle.transform.position.y))
+						{
+							nearestObstacle = candidateObstacle;
+						}
+					}
+				}
+			}
+		}
+
+		return nearestObstacle;
+	}
 
 	private PlatformShapeBinding GetShapeBinding(
 		PlatformShape platformShape)
@@ -84,6 +122,95 @@ public class PlayerPlatform : MonoBehaviour
 		return ShapeBindings
 			.Where(element => (element.ShapeType == platformShape))
 			.FirstOrDefault();
+	}
+	
+	private void InteractWithNearestObstacle()
+	{
+		if (nextObstacle == null)
+		{
+			nextObstacle = FindNextObstacle();
+		}
+
+		if (nextObstacle != null)
+		{
+			float signedDistanceToNextObstacle =
+				((transform.position.y - DistanceToPlatformBottom) - nextObstacle.transform.position.y);
+
+			if (signedDistanceToNextObstacle <= 0.0f)
+			{
+				if (IsAbleToPassThroughNextObstacle())
+				{
+					if (DebugEnabled)
+					{
+						Debug.LogFormat("Passed an obstacle at {0} mps!", CurrentFallSpeed);
+					}
+
+					CurrentAcceleration = Physics.gravity.magnitude;
+
+					nextObstacle = null;
+				}
+				else
+				{
+					bool impactWasLethal = (CurrentFallSpeed > LethalFallSpeed);
+
+					// If we penetrated the obstacle all, back up to where we're resting on the surface.
+					if (signedDistanceToNextObstacle < -0.01f)
+					{
+						if (DebugEnabled)
+						{
+							Debug.LogFormat(
+								"Backing up the shaft {0} meters.", 
+								(-1 * signedDistanceToNextObstacle));
+						}
+
+						scrollingElevatorShaft.AdvanceShaft(signedDistanceToNextObstacle);
+					}
+
+					CurrentAcceleration = 0.0f;
+					CurrentFallSpeed = 0.0f;
+				}
+			}
+		}
+	}
+
+	private bool IsAbleToPassThroughNextObstacle()
+	{
+		bool result = false;
+
+		if (nextObstacle == null)
+		{
+			result = true;
+		}
+		else if (EffectivePlatformShape == nextObstacle.RequiredPlatformShape)
+		{
+			float platformRotationRemainingDegrees =
+				Quaternion.Angle(morphingPlatformRoot.transform.rotation, PlatformRotationDesiredOrientation);
+
+			bool rotationHasFinished = (platformRotationRemainingDegrees < 10.0f);
+
+			if (rotationHasFinished)
+			{
+				if (nextObstacle.AllOrientationsAccepted)
+				{
+					result = true;
+				}
+				else
+				{
+					float platformDegreesFromObstacleOrientation =
+						Quaternion.Angle(morphingPlatformRoot.transform.rotation, nextObstacle.transform.rotation);
+
+					bool platformMatchesObstacleOrientation =
+						(platformDegreesFromObstacleOrientation < 10.0f);
+
+					if (platformMatchesObstacleOrientation)
+					{
+						result = true;
+					}
+				}
+			}
+		}
+
+		return result;
 	}
 
 	private void UpdatePlatformMorph()
