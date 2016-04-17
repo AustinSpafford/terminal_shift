@@ -184,10 +184,7 @@ public class ScrollingElevatorShaft : MonoBehaviour
 	private ShaftSegmentPrefab SelectRandomSegmentPrefab()
 	{
 		float totalSelectableWeight = 0.0f;
-
-		bool canSelectObstacle = 
-			(distanceSinceLastObstacleSegment > MinimumDistanceBetweenObstacleSegments);
-
+		
 		foreach (ShaftSegmentPrefab segmentPrefab in SegmentPrefabs)
 		{
 			if (CanSelectSegmentPrefab(segmentPrefab))

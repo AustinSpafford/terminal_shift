@@ -33,6 +33,14 @@ public class PlayerPlatform : MonoBehaviour
 
 	public float DistanceToPlatformBottom = 1.0f; // TODO: Refactor into a separate object/component.
 
+	public Color restingFogColor = Color.black;
+	public float restingFogEndDistance = 7.0f;
+	public float restingFogFadeSeconds = 1.0f;
+	public Color deadFogColor = Color.red;
+	public float deadFogEndDistance = 7.0f;
+	public float deadFogFadeSeconds = 0.25f;
+	public float freefallFogFadeSeconds = 2.0f;
+
 	public PlatformShapeBinding[] ShapeBindings = null;
 	
 	// TODO: Refactor the morphing platform into a separate object/component.
@@ -50,6 +58,7 @@ public class PlayerPlatform : MonoBehaviour
 
 	public void Awake()
 	{
+		fogManipulator = FindObjectOfType<FogManipulator>();
 		scrollingElevatorShaft = FindObjectOfType<ScrollingElevatorShaft>();
 
 		morphingPlatformRoot = new GameObject();
@@ -83,7 +92,8 @@ public class PlayerPlatform : MonoBehaviour
 	private GameObject morphingPlatformRoot = null;
 	private GameObject currentMorphStartObject = null;
 	private GameObject currentMorphEndObject = null;
-
+	
+	private FogManipulator fogManipulator = null;
 	private ScrollingElevatorShaft scrollingElevatorShaft = null;
 
 	private FloorObstacle nextObstacle = null;
@@ -131,43 +141,81 @@ public class PlayerPlatform : MonoBehaviour
 			nextObstacle = FindNextObstacle();
 		}
 
-		if (nextObstacle != null)
+		if (CurrentAcceleration > 0.0f)
 		{
-			float signedDistanceToNextObstacle =
-				((transform.position.y - DistanceToPlatformBottom) - nextObstacle.transform.position.y);
-
-			if (signedDistanceToNextObstacle <= 0.0f)
+			if (nextObstacle != null)
 			{
-				if (IsAbleToPassThroughNextObstacle())
+				float signedDistanceToNextObstacle =
+					((transform.position.y - DistanceToPlatformBottom) - nextObstacle.transform.position.y);
+				
+				bool hasReachedObstacle = 
+					(signedDistanceToNextObstacle < Mathf.Epsilon);
+
+				if (hasReachedObstacle)
 				{
-					if (DebugEnabled)
-					{
-						Debug.LogFormat("Passed an obstacle at {0} mps!", CurrentFallSpeed);
-					}
-
-					CurrentAcceleration = Physics.gravity.magnitude;
-
-					nextObstacle = null;
-				}
-				else
-				{
-					bool impactWasLethal = (CurrentFallSpeed > LethalFallSpeed);
-
-					// If we penetrated the obstacle all, back up to where we're resting on the surface.
-					if (signedDistanceToNextObstacle < -0.01f)
+					if (IsAbleToPassThroughNextObstacle())
 					{
 						if (DebugEnabled)
 						{
-							Debug.LogFormat(
-								"Backing up the shaft {0} meters.", 
-								(-1 * signedDistanceToNextObstacle));
+							Debug.LogFormat("Passed an obstacle at {0} mps!", CurrentFallSpeed);
 						}
 
-						scrollingElevatorShaft.AdvanceShaft(signedDistanceToNextObstacle);
+						nextObstacle = null;
 					}
+					else
+					{
+						if (DebugEnabled)
+						{
+							Debug.LogFormat("Rammed an obstacle at {0} mps!", CurrentFallSpeed);
+						}
 
-					CurrentAcceleration = 0.0f;
-					CurrentFallSpeed = 0.0f;
+						bool impactWasLethal = (CurrentFallSpeed > LethalFallSpeed);
+
+						// Snap to the obstacle (mainly to back up after penetrating into it).
+						scrollingElevatorShaft.AdvanceShaft(signedDistanceToNextObstacle);
+
+						CurrentAcceleration = 0.0f;
+						CurrentFallSpeed = 0.0f;
+
+						if (fogManipulator != null)
+						{
+							if (impactWasLethal)
+							{
+								fogManipulator.StartFadeToFogOverride(
+									deadFogColor,
+									0.0f, // startDistance
+									deadFogEndDistance,
+									deadFogFadeSeconds);
+							}
+							else
+							{
+								fogManipulator.StartFadeToFogOverride(
+									restingFogColor,
+									0.0f, // startDistance
+									restingFogEndDistance,
+									restingFogFadeSeconds);
+							}
+						}
+					}
+				}
+			}
+		}
+		else
+		{
+			if ((nextObstacle == null) ||
+				IsAbleToPassThroughNextObstacle())
+			{
+				if (DebugEnabled)
+				{
+					Debug.Log("Satisfied an obstacle while at rest, resuming descent.");
+				}
+
+				CurrentAcceleration = Physics.gravity.magnitude;
+
+				if (fogManipulator != null)
+				{
+					fogManipulator.StartFadeToOriginalFog(
+						freefallFogFadeSeconds);
 				}
 			}
 		}
@@ -186,7 +234,7 @@ public class PlayerPlatform : MonoBehaviour
 			float platformRotationRemainingDegrees =
 				Quaternion.Angle(morphingPlatformRoot.transform.rotation, PlatformRotationDesiredOrientation);
 
-			bool rotationHasFinished = (platformRotationRemainingDegrees < 10.0f);
+			bool rotationHasFinished = (platformRotationRemainingDegrees < 15.0f);
 
 			if (rotationHasFinished)
 			{
@@ -200,7 +248,7 @@ public class PlayerPlatform : MonoBehaviour
 						Quaternion.Angle(morphingPlatformRoot.transform.rotation, nextObstacle.transform.rotation);
 
 					bool platformMatchesObstacleOrientation =
-						(platformDegreesFromObstacleOrientation < 10.0f);
+						(platformDegreesFromObstacleOrientation < 15.0f);
 
 					if (platformMatchesObstacleOrientation)
 					{
@@ -345,9 +393,9 @@ public class PlayerPlatform : MonoBehaviour
 		if (currentDegreesFromTarget > Mathf.Epsilon)
 		{
 			float newDegreesFromTarget =
-				Mathf.SmoothDampAngle(
+				Mathf.SmoothDamp(
 					currentDegreesFromTarget,
-					0.0f, // targetAngle
+					0.0f, // target
 					ref PlatformRotationAngularVelocity,
 					PlatformRotationDurationSeconds);
 		

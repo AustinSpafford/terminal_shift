@@ -9,6 +9,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 436496}
   - 114: {fileID: 11412428}
+  - 114: {fileID: 11427636}
   m_Layer: 0
   m_Name: player_platform
   m_TagString: Untagged
@@ -122,6 +123,13 @@ MonoBehaviour:
   PlatformMorphDurationSeconds: 0.3
   PlatformRotationDurationSeconds: 0.2
   DistanceToPlatformBottom: 1.2
+  restingFogColor: {r: 0, g: 0, b: 0, a: 1}
+  restingFogEndDistance: 7
+  restingFogFadeSeconds: 1
+  deadFogColor: {r: 0.63235295, g: 0, b: 0, a: 1}
+  deadFogEndDistance: 7
+  deadFogFadeSeconds: 0.1
+  freefallFogFadeSeconds: 2
   ShapeBindings:
   - ShapeType: 0
     ShapePrefab: {fileID: 0}
@@ -142,7 +150,18 @@ MonoBehaviour:
   PlatformRotationDesiredOrientation: {x: 0, y: 0, z: 0, w: 1}
   PlatformRotationAngularVelocity: 0
   EffectivePlatformShape: 4
-  DebugEnabled: 0
+  DebugEnabled: 1
+--- !u!114 &11427636
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 112756}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b4496e2c465c67f4c8987ae0ea7e3a88, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
