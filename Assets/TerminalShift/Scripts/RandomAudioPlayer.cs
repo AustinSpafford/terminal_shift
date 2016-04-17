@@ -10,6 +10,7 @@ public class RandomAudioPlayer : MonoBehaviour
 	public float RandomPitchMax = 1.0f;
 	
 	public bool DestroyOnCompletion = true;
+	public float ReverbGracePeriodSeconds = 0.0f;
 
 	public void Start()
 	{
@@ -29,7 +30,7 @@ public class RandomAudioPlayer : MonoBehaviour
 		if ((audioSource.isPlaying == false) &&
 			DestroyOnCompletion)
 		{
-			GameObject.Destroy(gameObject);
+			GameObject.Destroy(gameObject, ReverbGracePeriodSeconds);
 		}
 	}
 

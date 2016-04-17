@@ -10,6 +10,7 @@ GameObject:
   - 4: {fileID: 403588}
   - 114: {fileID: 11444872}
   - 82: {fileID: 8262314}
+  - 164: {fileID: 16438544}
   m_Layer: 0
   m_Name: death_crunch_audio
   m_TagString: Untagged
@@ -122,6 +123,30 @@ MonoBehaviour:
   RandomPitchMin: 0.8
   RandomPitchMax: 1.2
   DestroyOnCompletion: 1
+  ReverbGracePeriodSeconds: 5
+--- !u!164 &16438544
+AudioReverbFilter:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 131934}
+  m_Enabled: 1
+  m_DryLevel: 0
+  m_Room: 0
+  m_RoomHF: 0
+  m_RoomRolloff: 0
+  m_DecayTime: 4
+  m_DecayHFRatio: 0.25
+  m_ReflectionsLevel: -10000
+  m_ReverbLevel: 0
+  m_ReverbDelay: 0.04
+  m_Diffusion: 100
+  m_Density: 100
+  m_HFReference: 5000
+  m_RoomLF: 0
+  m_LFReference: 250
+  m_ReflectionsDelay: 0
+  m_ReverbPreset: 27
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
