@@ -26,6 +26,8 @@ public class PlayerPlatform : MonoBehaviour
 	public float CurrentFallSpeed = 0.0f;
 	public float TerminalFallSpeed = 50.0f;
 	public float LethalFallSpeed = 10.0f;
+
+	public GameObject DeathCrunchAudioPrefab = null;
 	
 	public float PlatformMorphDurationSeconds = 1.0f;
 
@@ -177,9 +179,9 @@ public class PlayerPlatform : MonoBehaviour
 						CurrentAcceleration = 0.0f;
 						CurrentFallSpeed = 0.0f;
 
-						if (fogManipulator != null)
+						if (impactWasLethal)
 						{
-							if (impactWasLethal)
+							if (fogManipulator != null)
 							{
 								fogManipulator.StartFadeToFogOverride(
 									deadFogColor,
@@ -187,7 +189,30 @@ public class PlayerPlatform : MonoBehaviour
 									deadFogEndDistance,
 									deadFogFadeSeconds);
 							}
-							else
+
+							if (DeathCrunchAudioPrefab != null)
+							{
+								Vector3 mainCameraPosition = Camera.main.transform.position;
+
+								// Play the clip at roughly waist-height.
+								Vector3 deathAudioPosition = 
+									new Vector3(
+										mainCameraPosition.x,
+										Mathf.Lerp(transform.position.y, mainCameraPosition.y, 0.5f),
+										mainCameraPosition.z);
+								
+								GameObject deathAudio = 
+									GameObject.Instantiate(
+										DeathCrunchAudioPrefab,
+										deathAudioPosition,
+										transform.rotation) as GameObject;
+
+								deathAudio.transform.SetParent(transform);
+							}
+						}
+						else
+						{
+							if (fogManipulator != null)
 							{
 								fogManipulator.StartFadeToFogOverride(
 									restingFogColor,
