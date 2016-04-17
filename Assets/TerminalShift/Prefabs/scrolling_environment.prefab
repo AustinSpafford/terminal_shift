@@ -79,7 +79,7 @@ MonoBehaviour:
   SegmentInstances: []
   RequiredShaftTopY: 100
   RequiredShaftBottomY: -100
-  MinimumDistanceBetweenObstacleSegments: 100
+  MinimumDistanceBetweenObstacleSegments: 10
   DebugEnabled: 0
 --- !u!1001 &100100000
 Prefab:

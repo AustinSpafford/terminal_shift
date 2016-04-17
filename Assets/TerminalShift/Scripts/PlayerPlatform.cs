@@ -22,15 +22,28 @@ public class PlayerPlatform : MonoBehaviour
 		public GameObject ShapePrefab;
 	}
 
+	public float CurrentAcceleration = 0.0f;
 	public float CurrentFallSpeed = 0.0f;
 	public float TerminalFallSpeed = 50.0f;
+	public float LethalFallSpeed = 10.0f;
 	
 	public float PlatformMorphDurationSeconds = 1.0f;
 
 	public float PlatformRotationDurationSeconds = 1.0f;
 
+	public float DistanceToPlatformBottom = 1.0f; // TODO: Refactor into a separate object/component.
+
+	public Color restingFogColor = Color.black;
+	public float restingFogEndDistance = 7.0f;
+	public float restingFogFadeSeconds = 1.0f;
+	public Color deadFogColor = Color.red;
+	public float deadFogEndDistance = 7.0f;
+	public float deadFogFadeSeconds = 0.25f;
+	public float freefallFogFadeSeconds = 2.0f;
+
 	public PlatformShapeBinding[] ShapeBindings = null;
 	
+	// TODO: Refactor the morphing platform into a separate object/component.
 	public PlatformShape PlatformMorphDesiredShape = PlatformShape.LetterX;
 	public PlatformShape PlatformMorphStartShape = PlatformShape.LetterX;
 	public PlatformShape PlatformMorphEndShape = PlatformShape.LetterX;
@@ -41,8 +54,11 @@ public class PlayerPlatform : MonoBehaviour
 
 	public PlatformShape EffectivePlatformShape = PlatformShape.LetterX;
 
+	public bool DebugEnabled = false;
+
 	public void Awake()
 	{
+		fogManipulator = FindObjectOfType<FogManipulator>();
 		scrollingElevatorShaft = FindObjectOfType<ScrollingElevatorShaft>();
 
 		morphingPlatformRoot = new GameObject();
@@ -53,6 +69,8 @@ public class PlayerPlatform : MonoBehaviour
 			worldPositionStays: false);
 
 		UpdatePlatformMorphCreatedPlatformObjects();
+		
+		CurrentAcceleration = Physics.gravity.magnitude;
 	}
 
 	public void Update()
@@ -61,9 +79,11 @@ public class PlayerPlatform : MonoBehaviour
 
 		UpdatePlatformRotation();
 
+		InteractWithNearestObstacle();
+
 		CurrentFallSpeed = 
 			Mathf.Min(
-				(CurrentFallSpeed + (Physics.gravity.magnitude * Time.deltaTime)),
+				(CurrentFallSpeed + (CurrentAcceleration * Time.deltaTime)),
 				TerminalFallSpeed);
 
 		scrollingElevatorShaft.AdvanceShaft(CurrentFallSpeed * Time.deltaTime);
@@ -72,11 +92,39 @@ public class PlayerPlatform : MonoBehaviour
 	private GameObject morphingPlatformRoot = null;
 	private GameObject currentMorphStartObject = null;
 	private GameObject currentMorphEndObject = null;
-
+	
+	private FogManipulator fogManipulator = null;
 	private ScrollingElevatorShaft scrollingElevatorShaft = null;
+
+	private FloorObstacle nextObstacle = null;
 
 	private bool letterLAxisWasPressed = false;
 	private bool letterRAxisWasPressed = false;
+
+	private FloorObstacle FindNextObstacle()
+	{
+		FloorObstacle nearestObstacle = null;
+
+		foreach (ScrollingElevatorShaft.ShaftSegmentInstance segmentInstance in scrollingElevatorShaft.SegmentInstances)
+		{
+			if (segmentInstance.SourcePrefab.AnalyzedSegmentContainsObstacle)
+			{
+				foreach (FloorObstacle candidateObstacle in segmentInstance.Instance.GetComponentsInChildren<FloorObstacle>())
+				{
+					if (candidateObstacle.transform.position.y < (transform.position.y - DistanceToPlatformBottom))
+					{
+						if ((nearestObstacle == null) ||
+							(candidateObstacle.transform.position.y > nearestObstacle.transform.position.y))
+						{
+							nearestObstacle = candidateObstacle;
+						}
+					}
+				}
+			}
+		}
+
+		return nearestObstacle;
+	}
 
 	private PlatformShapeBinding GetShapeBinding(
 		PlatformShape platformShape)
@@ -84,6 +132,133 @@ public class PlayerPlatform : MonoBehaviour
 		return ShapeBindings
 			.Where(element => (element.ShapeType == platformShape))
 			.FirstOrDefault();
+	}
+	
+	private void InteractWithNearestObstacle()
+	{
+		if (nextObstacle == null)
+		{
+			nextObstacle = FindNextObstacle();
+		}
+
+		if (CurrentAcceleration > 0.0f)
+		{
+			if (nextObstacle != null)
+			{
+				float signedDistanceToNextObstacle =
+					((transform.position.y - DistanceToPlatformBottom) - nextObstacle.transform.position.y);
+				
+				bool hasReachedObstacle = 
+					(signedDistanceToNextObstacle < Mathf.Epsilon);
+
+				if (hasReachedObstacle)
+				{
+					if (IsAbleToPassThroughNextObstacle())
+					{
+						if (DebugEnabled)
+						{
+							Debug.LogFormat("Passed an obstacle at {0} mps!", CurrentFallSpeed);
+						}
+
+						nextObstacle = null;
+					}
+					else
+					{
+						if (DebugEnabled)
+						{
+							Debug.LogFormat("Rammed an obstacle at {0} mps!", CurrentFallSpeed);
+						}
+
+						bool impactWasLethal = (CurrentFallSpeed > LethalFallSpeed);
+
+						// Snap to the obstacle (mainly to back up after penetrating into it).
+						scrollingElevatorShaft.AdvanceShaft(signedDistanceToNextObstacle);
+
+						CurrentAcceleration = 0.0f;
+						CurrentFallSpeed = 0.0f;
+
+						if (fogManipulator != null)
+						{
+							if (impactWasLethal)
+							{
+								fogManipulator.StartFadeToFogOverride(
+									deadFogColor,
+									0.0f, // startDistance
+									deadFogEndDistance,
+									deadFogFadeSeconds);
+							}
+							else
+							{
+								fogManipulator.StartFadeToFogOverride(
+									restingFogColor,
+									0.0f, // startDistance
+									restingFogEndDistance,
+									restingFogFadeSeconds);
+							}
+						}
+					}
+				}
+			}
+		}
+		else
+		{
+			if ((nextObstacle == null) ||
+				IsAbleToPassThroughNextObstacle())
+			{
+				if (DebugEnabled)
+				{
+					Debug.Log("Satisfied an obstacle while at rest, resuming descent.");
+				}
+
+				CurrentAcceleration = Physics.gravity.magnitude;
+
+				if (fogManipulator != null)
+				{
+					fogManipulator.StartFadeToOriginalFog(
+						freefallFogFadeSeconds);
+				}
+			}
+		}
+	}
+
+	private bool IsAbleToPassThroughNextObstacle()
+	{
+		bool result = false;
+
+		if (nextObstacle == null)
+		{
+			result = true;
+		}
+		else if (EffectivePlatformShape == nextObstacle.RequiredPlatformShape)
+		{
+			float platformRotationRemainingDegrees =
+				Quaternion.Angle(morphingPlatformRoot.transform.rotation, PlatformRotationDesiredOrientation);
+
+			bool rotationHasFinished = (platformRotationRemainingDegrees < 15.0f);
+
+			if (rotationHasFinished)
+			{
+				if (nextObstacle.AllOrientationsAccepted)
+				{
+					result = true;
+				}
+				else
+				{
+					float platformDegreesFromObstacleOrientation =
+						Quaternion.Angle(morphingPlatformRoot.transform.rotation, nextObstacle.transform.rotation);
+
+					bool platformMatchesObstacleOrientation =
+						(platformDegreesFromObstacleOrientation < 15.0f);
+
+					if (platformMatchesObstacleOrientation)
+					{
+						result = true;
+					}
+				}
+			}
+		}
+
+		return result;
 	}
 
 	private void UpdatePlatformMorph()
@@ -218,9 +393,9 @@ public class PlayerPlatform : MonoBehaviour
 		if (currentDegreesFromTarget > Mathf.Epsilon)
 		{
 			float newDegreesFromTarget =
-				Mathf.SmoothDampAngle(
+				Mathf.SmoothDamp(
 					currentDegreesFromTarget,
-					0.0f, // targetAngle
+					0.0f, // target
 					ref PlatformRotationAngularVelocity,
 					PlatformRotationDurationSeconds);
 		
