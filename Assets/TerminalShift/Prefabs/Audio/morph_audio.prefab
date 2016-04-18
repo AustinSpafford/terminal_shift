@@ -1,44 +1,44 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &131934
+--- !u!1 &158192
 GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   serializedVersion: 4
   m_Component:
-  - 4: {fileID: 403588}
-  - 114: {fileID: 11444872}
-  - 82: {fileID: 8262314}
-  - 164: {fileID: 16438544}
+  - 4: {fileID: 474682}
+  - 114: {fileID: 11481026}
+  - 82: {fileID: 8258286}
+  - 164: {fileID: 16487102}
   m_Layer: 0
-  m_Name: death_crunch_audio
+  m_Name: morph_audio
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &403588
+--- !u!4 &474682
 Transform:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 131934}
+  m_GameObject: {fileID: 158192}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
---- !u!82 &8262314
+--- !u!82 &8258286
 AudioSource:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 131934}
+  m_GameObject: {fileID: 158192}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 24373956, guid: 2b5c0adaa84085e40843898f0e4456ad,
+  OutputAudioMixerGroup: {fileID: 24382388, guid: 2b5c0adaa84085e40843898f0e4456ad,
     type: 2}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 0
@@ -105,48 +105,49 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
---- !u!114 &11444872
+--- !u!114 &11481026
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 131934}
+  m_GameObject: {fileID: 158192}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 909a1681046ade640b89393efbea8fbc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   AvailableAudioClips:
-  - {fileID: 8300000, guid: bf930d69d586a444bb9c9c73c3818618, type: 3}
-  - {fileID: 8300000, guid: 2579d173c9d67654e8e14e7cdef684ca, type: 3}
-  - {fileID: 8300000, guid: 8b7c4c36e5a08a74bb3956c6f62b4a78, type: 3}
+  - {fileID: 8300000, guid: c10289d8f5ac3a14e97843b65502f7b7, type: 3}
+  - {fileID: 8300000, guid: 3753bae9b1707e145ba4be0182d11f6f, type: 3}
+  - {fileID: 8300000, guid: c091d5e7cbdd07c4e8997d43ce7f887e, type: 3}
+  - {fileID: 8300000, guid: ca419108c677def478a3c54b98e157bc, type: 3}
   RandomPitchMin: 0.8
   RandomPitchMax: 1.2
   DestroyOnCompletion: 1
-  ReverbGracePeriodSeconds: 5
---- !u!164 &16438544
+  ReverbGracePeriodSeconds: 3
+--- !u!164 &16487102
 AudioReverbFilter:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 131934}
+  m_GameObject: {fileID: 158192}
   m_Enabled: 1
   m_DryLevel: 0
-  m_Room: 0
-  m_RoomHF: 0
+  m_Room: -1000
+  m_RoomHF: -100
   m_RoomRolloff: 0
-  m_DecayTime: 4
-  m_DecayHFRatio: 0.25
-  m_ReflectionsLevel: -10000
-  m_ReverbLevel: 0
-  m_ReverbDelay: 0.04
+  m_DecayTime: 1.49
+  m_DecayHFRatio: 0.83
+  m_ReflectionsLevel: -2602
+  m_ReverbLevel: 200
+  m_ReverbDelay: 0.011
   m_Diffusion: 100
   m_Density: 100
   m_HFReference: 5000
   m_RoomLF: 0
   m_LFReference: 250
   m_ReflectionsDelay: 0
-  m_ReverbPreset: 27
+  m_ReverbPreset: 1
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
@@ -156,5 +157,5 @@ Prefab:
     m_Modifications: []
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
-  m_RootGameObject: {fileID: 131934}
+  m_RootGameObject: {fileID: 158192}
   m_IsPrefabParent: 1

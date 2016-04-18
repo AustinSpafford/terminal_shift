@@ -34,6 +34,8 @@ public class PlayerPlatform : MonoBehaviour
 	public float WindMaxVolume = 1.0f;
 
 	public GameObject DeathCrunchAudioPrefab = null;
+	public GameObject PlatformRotationAudioPrefab = null;
+	public GameObject PlatformMorphAudioPrefab = null;
 	
 	public float PlatformMorphDurationSeconds = 1.0f;
 
@@ -41,13 +43,15 @@ public class PlayerPlatform : MonoBehaviour
 
 	public float DistanceToPlatformBottom = 1.0f; // TODO: Refactor into a separate object/component.
 
-	public Color restingFogColor = Color.black;
-	public float restingFogEndDistance = 7.0f;
-	public float restingFogFadeSeconds = 1.0f;
-	public Color deadFogColor = Color.red;
-	public float deadFogEndDistance = 7.0f;
-	public float deadFogFadeSeconds = 0.25f;
-	public float freefallFogFadeSeconds = 2.0f;
+	public Color RestingFogColor = Color.black;
+	public float RestingFogEndDistance = 7.0f;
+	public float RestingFogFadeSeconds = 1.0f;
+	public Color DeadFogColor = Color.red;
+	public float DeadFogEndDistance = 7.0f;
+	public float DeadFogFadeSeconds = 0.25f;
+	public float FreefallFogFadeSeconds = 2.0f;
+
+	public bool SnapToNextObstacleHeight = true;
 
 	public PlatformShapeBinding[] ShapeBindings = null;
 	
@@ -151,6 +155,15 @@ public class PlayerPlatform : MonoBehaviour
 			nextObstacle = FindNextObstacle();
 		}
 
+		if (SnapToNextObstacleHeight &&
+			nextObstacle != null)
+		{
+			scrollingElevatorShaft.AdvanceShaft(
+				((transform.position.y - DistanceToPlatformBottom) - nextObstacle.transform.position.y));
+			
+			SnapToNextObstacleHeight = false;
+		}
+
 		if (CurrentAcceleration > 0.0f)
 		{
 			if (nextObstacle != null)
@@ -192,10 +205,10 @@ public class PlayerPlatform : MonoBehaviour
 							if (fogManipulator != null)
 							{
 								fogManipulator.StartFadeToFogOverride(
-									deadFogColor,
+									DeadFogColor,
 									0.0f, // startDistance
-									deadFogEndDistance,
-									deadFogFadeSeconds);
+									DeadFogEndDistance,
+									DeadFogFadeSeconds);
 							}
 
 							if (DeathCrunchAudioPrefab != null)
@@ -223,10 +236,10 @@ public class PlayerPlatform : MonoBehaviour
 							if (fogManipulator != null)
 							{
 								fogManipulator.StartFadeToFogOverride(
-									restingFogColor,
+									RestingFogColor,
 									0.0f, // startDistance
-									restingFogEndDistance,
-									restingFogFadeSeconds);
+									RestingFogEndDistance,
+									RestingFogFadeSeconds);
 							}
 						}
 					}
@@ -248,7 +261,7 @@ public class PlayerPlatform : MonoBehaviour
 				if (fogManipulator != null)
 				{
 					fogManipulator.StartFadeToOriginalFog(
-						freefallFogFadeSeconds);
+						FreefallFogFadeSeconds);
 				}
 			}
 		}
@@ -301,6 +314,14 @@ public class PlayerPlatform : MonoBehaviour
 		if (PlatformMorphDesiredShape != PlatformMorphEndShape)
 		{
 			UpdatePlatformMorphCreatedPlatformObjects();
+			
+			GameObject morpheAudio = 
+				GameObject.Instantiate(
+					PlatformMorphAudioPrefab,
+					transform.position,
+					transform.rotation) as GameObject;
+
+			morpheAudio.transform.SetParent(transform);
 		}
 
 		PlatformMorphFraction = 
@@ -379,34 +400,48 @@ public class PlayerPlatform : MonoBehaviour
 	{
 		bool letterLIsPressed = (Input.GetAxis("PlatformShapeL") > 0.5f);
 		bool letterRIsPressed = (Input.GetAxis("PlatformShapeR") > 0.5f);
+		
+		PlatformShape? newPlatformShape = null;
 
 		if (Input.GetButtonDown("PlatformShapeA"))
 		{
-			PlatformMorphDesiredShape = PlatformShape.LetterA;
+			newPlatformShape = PlatformShape.LetterA;
 		}
 		else if (Input.GetButtonDown("PlatformShapeB"))
 		{
-			PlatformMorphDesiredShape = PlatformShape.LetterB;
+			newPlatformShape = PlatformShape.LetterB;
 		}
-		else if (letterLIsPressed && (letterLAxisWasPressed == false))
+		else if ((letterLIsPressed && (letterLAxisWasPressed == false)))
 		{
-			PlatformMorphDesiredShape = PlatformShape.LetterL;
+			newPlatformShape = PlatformShape.LetterL;
 		}
-		else if (letterRIsPressed && (letterRAxisWasPressed == false))
+		else if ((letterRIsPressed && (letterRAxisWasPressed == false)))
 		{
-			PlatformMorphDesiredShape = PlatformShape.LetterR;
+			newPlatformShape = PlatformShape.LetterR;
 		}
 		else if (Input.GetButtonDown("PlatformShapeX"))
 		{
-			PlatformMorphDesiredShape = PlatformShape.LetterX;
+			newPlatformShape = PlatformShape.LetterX;
 		}
 		else if (Input.GetButtonDown("PlatformShapeY"))
 		{
-			PlatformMorphDesiredShape = PlatformShape.LetterY;
+			newPlatformShape = PlatformShape.LetterY;
 		}
 
 		letterLAxisWasPressed = letterLIsPressed;
 		letterRAxisWasPressed = letterRIsPressed;
+
+		// Validate that the desired shape actually exists (has artwork).
+		if (newPlatformShape.HasValue &&
+			(GetShapeBinding(newPlatformShape.Value).ShapePrefab == null))
+		{
+			newPlatformShape = null;
+		}
+
+		if (newPlatformShape.HasValue)
+		{
+			PlatformMorphDesiredShape = newPlatformShape.Value;
+		}
 	}
 	
 	private void UpdatePlatformRotation()
@@ -442,15 +477,32 @@ public class PlayerPlatform : MonoBehaviour
 
 	private void UpdatePlatformRotationDesiredOrientation()
 	{
+		bool playRotationAudio = false;
+
 		if (Input.GetButtonDown("PlatformRotateClockwise"))
 		{
 			PlatformRotationDesiredOrientation =
 				(Quaternion.Euler(0, 90, 0) * PlatformRotationDesiredOrientation);
+
+			playRotationAudio = true;
 		}
 		else if (Input.GetButtonDown("PlatformRotateCounterclockwise"))
 		{
 			PlatformRotationDesiredOrientation =
 				(Quaternion.Euler(0, -90, 0) * PlatformRotationDesiredOrientation);
+
+			playRotationAudio = true;
+		}
+
+		if (playRotationAudio)
+		{
+			GameObject rotationAudio = 
+				GameObject.Instantiate(
+					PlatformRotationAudioPrefab,
+					transform.position,
+					transform.rotation) as GameObject;
+
+			rotationAudio.transform.SetParent(transform);
 		}
 	}
 
