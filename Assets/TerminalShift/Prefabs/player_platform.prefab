@@ -229,13 +229,15 @@ MonoBehaviour:
   LethalFallSpeed: 25
   WindAudioBlender: {fileID: 11458462}
   WindMinFallSpeed: 1
-  WindMinVolume: 0.2
+  WindMinVolume: 0.1
   WindMaxFallSpeed: 20
   WindMaxVolume: 1
   DeathCrunchAudioPrefab: {fileID: 131934, guid: 320832a4deb18bf47b71fab0a29c24ce,
     type: 2}
-  PlatformRotationAudioPrefab: {fileID: 0}
-  PlatformMorphAudioPrefab: {fileID: 0}
+  PlatformRotationAudioPrefab: {fileID: 177260, guid: 4cce1e878d43a3746b7f0d2f982573fa,
+    type: 2}
+  PlatformMorphAudioPrefab: {fileID: 158192, guid: 04014430586def942ad1800baecfa358,
+    type: 2}
   PlatformMorphDurationSeconds: 0.3
   PlatformRotationDurationSeconds: 0.2
   DistanceToPlatformBottom: 1.2

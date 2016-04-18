@@ -314,6 +314,14 @@ public class PlayerPlatform : MonoBehaviour
 		if (PlatformMorphDesiredShape != PlatformMorphEndShape)
 		{
 			UpdatePlatformMorphCreatedPlatformObjects();
+			
+			GameObject morpheAudio = 
+				GameObject.Instantiate(
+					PlatformMorphAudioPrefab,
+					transform.position,
+					transform.rotation) as GameObject;
+
+			morpheAudio.transform.SetParent(transform);
 		}
 
 		PlatformMorphFraction = 
@@ -469,15 +477,32 @@ public class PlayerPlatform : MonoBehaviour
 
 	private void UpdatePlatformRotationDesiredOrientation()
 	{
+		bool playRotationAudio = false;
+
 		if (Input.GetButtonDown("PlatformRotateClockwise"))
 		{
 			PlatformRotationDesiredOrientation =
 				(Quaternion.Euler(0, 90, 0) * PlatformRotationDesiredOrientation);
+
+			playRotationAudio = true;
 		}
 		else if (Input.GetButtonDown("PlatformRotateCounterclockwise"))
 		{
 			PlatformRotationDesiredOrientation =
 				(Quaternion.Euler(0, -90, 0) * PlatformRotationDesiredOrientation);
+
+			playRotationAudio = true;
+		}
+
+		if (playRotationAudio)
+		{
+			GameObject rotationAudio = 
+				GameObject.Instantiate(
+					PlatformRotationAudioPrefab,
+					transform.position,
+					transform.rotation) as GameObject;
+
+			rotationAudio.transform.SetParent(transform);
 		}
 	}
 

@@ -20,6 +20,7 @@ AudioMixerController:
     - 6b484937cdb709349b0af0d1448cb1f2
     - 638188a21ffb8234cb8f4c8863f106c9
     - d5b874016a13e504997dbf2d9c81690c
+    - b5c52162b94953b479f55c0e928745a2
     name: View
   m_CurrentViewIndex: 0
   m_TargetSnapshot: {fileID: 24500003}
@@ -35,6 +36,7 @@ AudioMixerGroupController:
   - {fileID: 24363766}
   - {fileID: 24313340}
   - {fileID: 24382388}
+  - {fileID: 24373956}
   m_Volume: f1e6d5918a59fbb4184a85968486080e
   m_Pitch: 105c30ea2d257ec4ebb22cbece4a7dcb
   m_Effects:
@@ -74,6 +76,23 @@ AudioMixerGroupController:
   m_Effects:
   - {fileID: 24447552}
   - {fileID: 24484332}
+  m_UserColorIndex: 0
+  m_Mute: 0
+  m_Solo: 0
+  m_BypassEffects: 0
+--- !u!243 &24373956
+AudioMixerGroupController:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: Death Crunch
+  m_AudioMixer: {fileID: 24100000}
+  m_GroupID: b5c52162b94953b479f55c0e928745a2
+  m_Children: []
+  m_Volume: 01a376b8eaf54114e88d89fe4571fc04
+  m_Pitch: 8052dbe35231886498f49bfc7c44cc0a
+  m_Effects:
+  - {fileID: 24489070}
   m_UserColorIndex: 0
   m_Mute: 0
   m_Solo: 0
@@ -188,6 +207,19 @@ AudioMixerEffectController:
   m_SendTarget: {fileID: 0}
   m_EnableWetMix: 0
   m_Bypass: 0
+--- !u!244 &24489070
+AudioMixerEffectController:
+  m_ObjectHideFlags: 3
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: 
+  m_EffectID: e4e320cfddb3bd949a523ea7089a84e6
+  m_EffectName: Attenuation
+  m_MixLevel: 6bf3e58a18bbc8140ab7d7209ecdc419
+  m_Parameters: []
+  m_SendTarget: {fileID: 0}
+  m_EnableWetMix: 0
+  m_Bypass: 0
 --- !u!245 &24500003
 AudioMixerSnapshotController:
   m_ObjectHideFlags: 0
@@ -197,5 +229,8 @@ AudioMixerSnapshotController:
   m_AudioMixer: {fileID: 24100000}
   m_SnapshotID: be9b9b19a50eec44ba9ee5ac8ee8de7e
   m_FloatValues:
+    6904c1d27e0084449afd14a207afb72a: -4.9356437
+    01a376b8eaf54114e88d89fe4571fc04: 2.4583216
     54a2273978921d4449c2037d1e1c8e5d: 15
+    2c1cfaff97e29704295587819f5049d4: 5.1526933
   m_TransitionOverrides: {}
