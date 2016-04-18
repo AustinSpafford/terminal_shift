@@ -27,6 +27,9 @@ public class ScrollingElevatorShaft : MonoBehaviour
 	public float RequiredShaftTopY = 30.0f;
 	public float RequiredShaftBottomY = -30.0f;
 
+	public float ClearSegmentWeightScalar = 1.0f;
+	public float ObstacleSegmentWeightScalar = 1.0f;
+
 	public float MinimumDistanceBetweenObstacleSegments = 30.0f;
 
 	public bool DebugEnabled = false;
@@ -36,8 +39,53 @@ public class ScrollingElevatorShaft : MonoBehaviour
 		UpdateShaftSegmentPrefabs();
 	}
 
+	public void Start()
+	{
+		// Populate an initial shaft.
+		{
+			float savedClearSegmentWeightScalar = ClearSegmentWeightScalar;
+			float savedObstacleSegmentWeightScalar = ObstacleSegmentWeightScalar;
+
+			// Clear segments above the player.
+			{
+				ClearSegmentWeightScalar = 1.0f;
+				ObstacleSegmentWeightScalar = 0.0f;
+
+				AdvanceShaftInternal(
+					RequiredShaftTopY,
+					shaftBottomY: 0.0f);
+			}
+
+			// Entirely obstacles below the player.
+			{
+				ClearSegmentWeightScalar = 0.0f;
+				ObstacleSegmentWeightScalar = 1.0f;
+
+				AdvanceShaftInternal(
+					movementDistance: 0.0f,
+					shaftBottomY: RequiredShaftBottomY);
+			}
+
+			ClearSegmentWeightScalar = savedClearSegmentWeightScalar;
+			ObstacleSegmentWeightScalar = savedObstacleSegmentWeightScalar;
+		}
+	}
+
 	public void AdvanceShaft(
 		float movementDistance)
+	{
+		AdvanceShaftInternal(
+			movementDistance,
+			RequiredShaftBottomY);
+	}
+
+	private System.Random segmentRandomizer = new System.Random();
+
+	private float distanceSinceLastObstacleSegment = 10000.0f;
+
+	private void AdvanceShaftInternal(
+		float movementDistance,
+		float shaftBottomY)
 	{
 		// Advance all the existing shaft segments.
 		foreach (ShaftSegmentInstance segmentInstance in SegmentInstances)
@@ -75,7 +123,10 @@ public class ScrollingElevatorShaft : MonoBehaviour
 
 		// Create new shaft segments.
 		{
-			Bounds shaftBounds = new Bounds();
+			Bounds shaftBounds = 
+				new Bounds(
+					new Vector3(0.0f, RequiredShaftTopY, 0.0f),
+					Vector3.zero);
 			
 			foreach (ShaftSegmentInstance segmentInstance in SegmentInstances)
 			{
@@ -85,7 +136,7 @@ public class ScrollingElevatorShaft : MonoBehaviour
 				shaftBounds.Encapsulate(segmentBounds);
 			}
 
-			while (shaftBounds.min.y > RequiredShaftBottomY)
+			while (shaftBounds.min.y > shaftBottomY)
 			{
 				ShaftSegmentPrefab randomSegmentPrefab = SelectRandomSegmentPrefab();
 
@@ -138,10 +189,6 @@ public class ScrollingElevatorShaft : MonoBehaviour
 		}
 	}
 
-	private System.Random segmentRandomizer = new System.Random();
-
-	private float distanceSinceLastObstacleSegment = 10000.0f;
-
 	private void UpdateShaftSegmentPrefabs()
 	{
 		foreach (ShaftSegmentPrefab segmentPrefab in SegmentPrefabs)
@@ -174,11 +221,35 @@ public class ScrollingElevatorShaft : MonoBehaviour
 	private bool CanSelectSegmentPrefab(
 		ShaftSegmentPrefab segmentPrefab)
 	{
-		bool segmentIsUnselectableObstacle = (
+		bool segmentIsSelectable = true;
+
+		bool segmentIsObstacleInCooldown = (
 			segmentPrefab.AnalyzedSegmentContainsObstacle &&
 			(distanceSinceLastObstacleSegment <= MinimumDistanceBetweenObstacleSegments));
 
-		return !segmentIsUnselectableObstacle;
+		if (segmentIsObstacleInCooldown)
+		{
+			bool isPossibleToSelectNonObstacles = 
+				(ClearSegmentWeightScalar > 0.0f);
+
+			if (isPossibleToSelectNonObstacles)
+			{
+				segmentIsSelectable = false;
+			}
+		}
+
+		return segmentIsSelectable;
+	}
+
+	private float GetSegmentPrefabSelectionWeight(
+		ShaftSegmentPrefab segmentPrefab)
+	{
+		float weightScalar = 
+			segmentPrefab.AnalyzedSegmentContainsObstacle ?
+				ObstacleSegmentWeightScalar :
+				ClearSegmentWeightScalar;
+
+		return (segmentPrefab.SelectionWeight * weightScalar);
 	}
 
 	private ShaftSegmentPrefab SelectRandomSegmentPrefab()
@@ -189,7 +260,7 @@ public class ScrollingElevatorShaft : MonoBehaviour
 		{
 			if (CanSelectSegmentPrefab(segmentPrefab))
 			{
-				totalSelectableWeight += segmentPrefab.SelectionWeight;
+				totalSelectableWeight += GetSegmentPrefabSelectionWeight(segmentPrefab);
 			}
 		}
 
@@ -204,7 +275,7 @@ public class ScrollingElevatorShaft : MonoBehaviour
 			{
 				if (CanSelectSegmentPrefab(segmentPrefab))
 				{
-					remainingTotalWeightUntilSelection -= segmentPrefab.SelectionWeight;
+					remainingTotalWeightUntilSelection -= GetSegmentPrefabSelectionWeight(segmentPrefab);
 
 					if (remainingTotalWeightUntilSelection < Mathf.Epsilon)
 					{

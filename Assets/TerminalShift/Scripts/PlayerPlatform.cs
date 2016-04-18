@@ -41,13 +41,15 @@ public class PlayerPlatform : MonoBehaviour
 
 	public float DistanceToPlatformBottom = 1.0f; // TODO: Refactor into a separate object/component.
 
-	public Color restingFogColor = Color.black;
-	public float restingFogEndDistance = 7.0f;
-	public float restingFogFadeSeconds = 1.0f;
-	public Color deadFogColor = Color.red;
-	public float deadFogEndDistance = 7.0f;
-	public float deadFogFadeSeconds = 0.25f;
-	public float freefallFogFadeSeconds = 2.0f;
+	public Color RestingFogColor = Color.black;
+	public float RestingFogEndDistance = 7.0f;
+	public float RestingFogFadeSeconds = 1.0f;
+	public Color DeadFogColor = Color.red;
+	public float DeadFogEndDistance = 7.0f;
+	public float DeadFogFadeSeconds = 0.25f;
+	public float FreefallFogFadeSeconds = 2.0f;
+
+	public bool SnapToNextObstacleHeight = true;
 
 	public PlatformShapeBinding[] ShapeBindings = null;
 	
@@ -151,6 +153,15 @@ public class PlayerPlatform : MonoBehaviour
 			nextObstacle = FindNextObstacle();
 		}
 
+		if (SnapToNextObstacleHeight &&
+			nextObstacle != null)
+		{
+			scrollingElevatorShaft.AdvanceShaft(
+				((transform.position.y - DistanceToPlatformBottom) - nextObstacle.transform.position.y));
+			
+			SnapToNextObstacleHeight = false;
+		}
+
 		if (CurrentAcceleration > 0.0f)
 		{
 			if (nextObstacle != null)
@@ -192,10 +203,10 @@ public class PlayerPlatform : MonoBehaviour
 							if (fogManipulator != null)
 							{
 								fogManipulator.StartFadeToFogOverride(
-									deadFogColor,
+									DeadFogColor,
 									0.0f, // startDistance
-									deadFogEndDistance,
-									deadFogFadeSeconds);
+									DeadFogEndDistance,
+									DeadFogFadeSeconds);
 							}
 
 							if (DeathCrunchAudioPrefab != null)
@@ -223,10 +234,10 @@ public class PlayerPlatform : MonoBehaviour
 							if (fogManipulator != null)
 							{
 								fogManipulator.StartFadeToFogOverride(
-									restingFogColor,
+									RestingFogColor,
 									0.0f, // startDistance
-									restingFogEndDistance,
-									restingFogFadeSeconds);
+									RestingFogEndDistance,
+									RestingFogFadeSeconds);
 							}
 						}
 					}
@@ -248,7 +259,7 @@ public class PlayerPlatform : MonoBehaviour
 				if (fogManipulator != null)
 				{
 					fogManipulator.StartFadeToOriginalFog(
-						freefallFogFadeSeconds);
+						FreefallFogFadeSeconds);
 				}
 			}
 		}
