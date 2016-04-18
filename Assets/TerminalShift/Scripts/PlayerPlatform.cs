@@ -379,34 +379,48 @@ public class PlayerPlatform : MonoBehaviour
 	{
 		bool letterLIsPressed = (Input.GetAxis("PlatformShapeL") > 0.5f);
 		bool letterRIsPressed = (Input.GetAxis("PlatformShapeR") > 0.5f);
+		
+		PlatformShape? newPlatformShape = null;
 
 		if (Input.GetButtonDown("PlatformShapeA"))
 		{
-			PlatformMorphDesiredShape = PlatformShape.LetterA;
+			newPlatformShape = PlatformShape.LetterA;
 		}
 		else if (Input.GetButtonDown("PlatformShapeB"))
 		{
-			PlatformMorphDesiredShape = PlatformShape.LetterB;
+			newPlatformShape = PlatformShape.LetterB;
 		}
-		else if (letterLIsPressed && (letterLAxisWasPressed == false))
+		else if ((letterLIsPressed && (letterLAxisWasPressed == false)))
 		{
-			PlatformMorphDesiredShape = PlatformShape.LetterL;
+			newPlatformShape = PlatformShape.LetterL;
 		}
-		else if (letterRIsPressed && (letterRAxisWasPressed == false))
+		else if ((letterRIsPressed && (letterRAxisWasPressed == false)))
 		{
-			PlatformMorphDesiredShape = PlatformShape.LetterR;
+			newPlatformShape = PlatformShape.LetterR;
 		}
 		else if (Input.GetButtonDown("PlatformShapeX"))
 		{
-			PlatformMorphDesiredShape = PlatformShape.LetterX;
+			newPlatformShape = PlatformShape.LetterX;
 		}
 		else if (Input.GetButtonDown("PlatformShapeY"))
 		{
-			PlatformMorphDesiredShape = PlatformShape.LetterY;
+			newPlatformShape = PlatformShape.LetterY;
 		}
 
 		letterLAxisWasPressed = letterLIsPressed;
 		letterRAxisWasPressed = letterRIsPressed;
+
+		// Validate that the desired shape actually exists (has artwork).
+		if (newPlatformShape.HasValue &&
+			(GetShapeBinding(newPlatformShape.Value).ShapePrefab == null))
+		{
+			newPlatformShape = null;
+		}
+
+		if (newPlatformShape.HasValue)
+		{
+			PlatformMorphDesiredShape = newPlatformShape.Value;
+		}
 	}
 	
 	private void UpdatePlatformRotation()
