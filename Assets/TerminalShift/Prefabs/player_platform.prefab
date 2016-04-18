@@ -234,6 +234,8 @@ MonoBehaviour:
   WindMaxVolume: 1
   DeathCrunchAudioPrefab: {fileID: 131934, guid: 320832a4deb18bf47b71fab0a29c24ce,
     type: 2}
+  PlatformRotationAudioPrefab: {fileID: 0}
+  PlatformMorphAudioPrefab: {fileID: 0}
   PlatformMorphDurationSeconds: 0.3
   PlatformRotationDurationSeconds: 0.2
   DistanceToPlatformBottom: 1.2

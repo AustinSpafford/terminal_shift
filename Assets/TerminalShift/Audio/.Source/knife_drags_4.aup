@@ -1,0 +1,33 @@
+<?xml version="1.0" standalone="no" ?>
+<!DOCTYPE project PUBLIC "-//audacityproject-1.3.0//DTD//EN" "http://audacity.sourceforge.net/xml/audacityproject-1.3.0.dtd" >
+<project xmlns="http://audacity.sourceforge.net/xml/" projname="knife_drags_4_data" version="1.3.0" audacityversion="2.1.2" sel0="19.6507772021" sel1="20.8817172465" vpos="0" h="18.9246484086" zoom="750.5555555556" rate="44100.0" snapto="off" selectionformat="hh:mm:ss + milliseconds" frequencyformat="Hz" bandwidthformat="octaves">
+	<tags/>
+	<wavetrack name="knife_drags_4" channel="2" linked="0" mute="0" solo="0" height="150" minimized="0" isSelected="1" rate="44100" gain="1.0" pan="0.0">
+		<waveclip offset="0.00000000">
+			<sequence maxsamples="262144" sampleformat="262159" numsamples="1169280">
+				<waveblock start="0">
+					<simpleblockfile filename="e0000986.au" len="262144" min="-0.060403" max="0.054162" rms="0.00238"/>
+				</waveblock>
+				<waveblock start="262144">
+					<simpleblockfile filename="e00000ea.au" len="262144" min="-0.037055" max="0.044584" rms="0.001511"/>
+				</waveblock>
+				<waveblock start="524288">
+					<simpleblockfile filename="e0000b11.au" len="262144" min="-0.279663" max="0.231289" rms="0.011198"/>
+				</waveblock>
+				<waveblock start="786432">
+					<simpleblockfile filename="e0000743.au" len="262144" min="-0.028803" max="0.028939" rms="0.002094"/>
+				</waveblock>
+				<waveblock start="1048576">
+					<simpleblockfile filename="e00007de.au" len="120704" min="-0.045296" max="0.050319" rms="0.003302"/>
+				</waveblock>
+			</sequence>
+			<envelope numpoints="0"/>
+		</waveclip>
+	</wavetrack>
+	<labeltrack name="Label Track" numlabels="4" height="73" minimized="0" isSelected="1">
+		<label t="1.6774241303" t1="3.1826301505" title="morph_1"/>
+		<label t="8.2365655070" t1="9.0556131261" title="morph_2"/>
+		<label t="15.1527757217" t1="16.4626696274" title="morph_3"/>
+		<label t="19.6507772021" t1="20.8817172465" title="morph_4"/>
+	</labeltrack>
+</project>

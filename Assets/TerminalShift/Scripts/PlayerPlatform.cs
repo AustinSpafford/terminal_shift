@@ -34,6 +34,8 @@ public class PlayerPlatform : MonoBehaviour
 	public float WindMaxVolume = 1.0f;
 
 	public GameObject DeathCrunchAudioPrefab = null;
+	public GameObject PlatformRotationAudioPrefab = null;
+	public GameObject PlatformMorphAudioPrefab = null;
 	
 	public float PlatformMorphDurationSeconds = 1.0f;
 
